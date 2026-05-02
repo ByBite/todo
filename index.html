@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ToDo - simple task list saved in your browser</title>
-    <meta name="description" content="A simple todo app for adding, filtering, and completing tasks. Your list is saved locally in the browser.">
+    <title>ToDo Task Planner - browser todo list with timers</title>
+    <meta name="description" content="Plan tasks in a simple browser ToDo app with local storage, multilingual UI, task timers, presets, and desktop notifications.">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#07110d">
     <meta name="application-name" content="ToDo">
@@ -13,13 +13,13 @@
 
     <meta property="og:locale" content="en_US">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="ToDo - simple task list saved in your browser">
-    <meta property="og:description" content="A simple todo app for adding, filtering, and completing tasks. Your list is saved locally in the browser.">
+    <meta property="og:title" content="ToDo Task Planner - browser todo list with timers">
+    <meta property="og:description" content="Plan tasks in a simple browser ToDo app with local storage, multilingual UI, task timers, presets, and desktop notifications.">
     <meta property="og:site_name" content="ToDo">
 
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="ToDo - simple task list saved in your browser">
-    <meta name="twitter:description" content="A simple todo app for adding, filtering, and completing tasks. Your list is saved locally in the browser.">
+    <meta name="twitter:title" content="ToDo Task Planner - browser todo list with timers">
+    <meta name="twitter:description" content="Plan tasks in a simple browser ToDo app with local storage, multilingual UI, task timers, presets, and desktop notifications.">
 
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="styles.css">
@@ -31,7 +31,7 @@
         "applicationCategory": "ProductivityApplication",
         "operatingSystem": "Any",
         "inLanguage": ["pl-PL", "en", "de"],
-        "description": "A simple todo app for adding, filtering, and completing tasks. Your list is saved locally in the browser.",
+        "description": "Plan tasks in a simple browser ToDo app with local storage, multilingual UI, task timers, presets, and desktop notifications.",
         "offers": {
           "@type": "Offer",
           "price": "0",
@@ -44,7 +44,8 @@
     <main class="app" aria-labelledby="page-title">
       <header class="app__header">
         <div>
-          <h1 id="page-title">ToDo</h1>
+          <h1 id="page-title" data-i18n="appHeading">ToDo Task Planner</h1>
+          <p class="helper-text" data-i18n="appIntro">Plan tasks, set a timer, and keep everything saved locally in your browser.</p>
         </div>
         <div class="header-actions">
           <div class="language-switcher" role="group" aria-label="Language selection" data-i18n-aria="languageSwitcherLabel">
@@ -68,7 +69,22 @@
       <form class="task-form" id="task-form" autocomplete="off">
         <label class="sr-only" for="task-input" data-i18n="inputLabel">New task</label>
         <input id="task-input" type="text" maxlength="120" placeholder="Add a new task..." data-i18n-placeholder="inputPlaceholder" required>
-        <button type="submit" data-i18n="addButton">Add</button>
+        <div class="timer-controls" aria-label="Task timer" data-i18n-aria="timerLabel">
+          <span class="timer-controls__label" data-i18n="timerLabel">Timer</span>
+          <div class="timer-presets" role="group" aria-label="Timer presets" data-i18n-aria="timerPresetsLabel">
+            <button class="timer-preset is-active" type="button" data-duration="0" data-i18n="timerNone">No timer</button>
+            <button class="timer-preset" type="button" data-duration="600000">10 min</button>
+            <button class="timer-preset" type="button" data-duration="3600000">1 h</button>
+            <button class="timer-preset" type="button" data-duration="18000000">5 h</button>
+            <button class="timer-preset" type="button" data-duration="custom" data-i18n="timerCustom">Custom</button>
+          </div>
+          <label class="custom-timer is-hidden" for="custom-timer-input">
+            <span data-i18n="customTimerLabel">Minutes</span>
+            <input id="custom-timer-input" type="number" min="1" max="10080" step="1" value="30" inputmode="numeric">
+          </label>
+          <p class="form-help" id="notification-help" data-i18n="notificationHelp">Timed tasks can send a browser notification when the time ends.</p>
+        </div>
+        <button class="add-button" type="submit" data-i18n="addButton">Add task</button>
       </form>
 
       <section class="toolbar" aria-label="Task filters" data-i18n-aria="filtersLabel">
@@ -92,7 +108,10 @@
       <li class="task">
         <label class="task__label">
           <input class="task__checkbox" type="checkbox">
-          <span class="task__text"></span>
+          <span class="task__content">
+            <span class="task__text"></span>
+            <span class="task__timer"></span>
+          </span>
         </label>
         <button class="task__delete" type="button" aria-label="Delete task" data-i18n-aria="deleteTask">&times;</button>
       </li>
