@@ -3,13 +3,23 @@ const LANGUAGE_KEY = "todo.language.v1";
 
 const translations = {
   pl: {
-    pageTitle: "ToDo - prosta lista zadań zapisywana w przeglądarce",
+    appHeading: "ToDo planer zadań",
+    appIntro:
+      "Planuj zadania, ustawiaj timer i zapisuj wszystko lokalnie w swojej przeglądarce.",
+    pageTitle: "ToDo planer zadań - lista todo z timerami w przeglądarce",
     pageDescription:
-      "Prosta aplikacja todo do tworzenia, filtrowania i odhaczania zadań. Lista zapisuje dane lokalnie w przeglądarce.",
+      "Planuj zadania w prostej aplikacji ToDo z lokalnym zapisem, wieloma językami, timerami, gotowymi czasami i powiadomieniami.",
     inputLabel: "Nowe zadanie",
     languageSwitcherLabel: "Wybór języka",
     inputPlaceholder: "Dodaj nowe zadanie...",
-    addButton: "Dodaj",
+    addButton: "Dodaj zadanie",
+    timerLabel: "Timer",
+    timerPresetsLabel: "Gotowe czasy timera",
+    timerNone: "Bez timera",
+    timerCustom: "Własny",
+    customTimerLabel: "Minuty",
+    notificationHelp:
+      "Zadania z timerem mogą wysłać powiadomienie w przeglądarce po zakończeniu czasu.",
     filtersLabel: "Filtry zadań",
     showTasksLabel: "Pokaż zadania",
     filterAll: "Wszystkie",
@@ -22,16 +32,31 @@ const translations = {
     zeroTasks: "0 zadań",
     activeSingular: "1 aktywne",
     activePlural: "{count} aktywne",
+    timeLeft: "Pozostało {time}",
+    timeExpired: "Czas minął",
+    notificationTitle: "Timer zakończony",
+    notificationBody: "Czas na zadanie: {task}",
     htmlLang: "pl",
+    ogLocale: "pl_PL",
   },
   en: {
-    pageTitle: "ToDo - simple task list saved in your browser",
+    appHeading: "ToDo task planner",
+    appIntro:
+      "Plan tasks, set a timer, and keep everything saved locally in your browser.",
+    pageTitle: "ToDo Task Planner - browser todo list with timers",
     pageDescription:
-      "A simple todo app for adding, filtering, and completing tasks. Your list is saved locally in the browser.",
+      "Plan tasks in a simple browser ToDo app with local storage, multilingual UI, task timers, presets, and desktop notifications.",
     inputLabel: "New task",
     languageSwitcherLabel: "Language selection",
     inputPlaceholder: "Add a new task...",
-    addButton: "Add",
+    addButton: "Add task",
+    timerLabel: "Timer",
+    timerPresetsLabel: "Timer presets",
+    timerNone: "No timer",
+    timerCustom: "Custom",
+    customTimerLabel: "Minutes",
+    notificationHelp:
+      "Timed tasks can send a browser notification when the time ends.",
     filtersLabel: "Task filters",
     showTasksLabel: "Show tasks",
     filterAll: "All",
@@ -44,16 +69,31 @@ const translations = {
     zeroTasks: "0 tasks",
     activeSingular: "1 active",
     activePlural: "{count} active",
+    timeLeft: "{time} left",
+    timeExpired: "Time is up",
+    notificationTitle: "Timer finished",
+    notificationBody: "Time for task: {task}",
     htmlLang: "en",
+    ogLocale: "en_US",
   },
   de: {
-    pageTitle: "ToDo - einfache Aufgabenliste im Browser gespeichert",
+    appHeading: "ToDo Aufgabenplaner",
+    appIntro:
+      "Plane Aufgaben, stelle einen Timer ein und speichere alles lokal in deinem Browser.",
+    pageTitle: "ToDo Aufgabenplaner - Browser-ToDo-Liste mit Timern",
     pageDescription:
-      "Eine einfache ToDo-App zum Erstellen, Filtern und Abhaken von Aufgaben. Die Liste wird lokal im Browser gespeichert.",
+      "Plane Aufgaben in einer einfachen ToDo-App mit lokalem Speicher, mehreren Sprachen, Timern, Vorlagen und Benachrichtigungen.",
     inputLabel: "Neue Aufgabe",
     languageSwitcherLabel: "Sprachauswahl",
     inputPlaceholder: "Neue Aufgabe hinzufügen...",
-    addButton: "Hinzufügen",
+    addButton: "Aufgabe hinzufügen",
+    timerLabel: "Timer",
+    timerPresetsLabel: "Timer-Vorlagen",
+    timerNone: "Ohne Timer",
+    timerCustom: "Eigener",
+    customTimerLabel: "Minuten",
+    notificationHelp:
+      "Aufgaben mit Timer können eine Browser-Benachrichtigung senden, wenn die Zeit abgelaufen ist.",
     filtersLabel: "Aufgabenfilter",
     showTasksLabel: "Aufgaben anzeigen",
     filterAll: "Alle",
@@ -66,7 +106,12 @@ const translations = {
     zeroTasks: "0 Aufgaben",
     activeSingular: "1 aktiv",
     activePlural: "{count} aktiv",
+    timeLeft: "Noch {time}",
+    timeExpired: "Zeit abgelaufen",
+    notificationTitle: "Timer beendet",
+    notificationBody: "Zeit für die Aufgabe: {task}",
     htmlLang: "de",
+    ogLocale: "de_DE",
   },
 };
 
@@ -78,12 +123,16 @@ const emptyState = document.querySelector("#empty-state");
 const counter = document.querySelector("#task-counter");
 const clearCompleted = document.querySelector("#clear-completed");
 const clearAll = document.querySelector("#clear-all");
+const customTimer = document.querySelector(".custom-timer");
+const customTimerInput = document.querySelector("#custom-timer-input");
 const filterButtons = document.querySelectorAll(".filter");
 const languageButtons = document.querySelectorAll(".language-button");
+const timerPresetButtons = document.querySelectorAll(".timer-preset");
 
 let tasks = loadTasks();
 let currentFilter = "all";
 let currentLanguage = loadLanguage();
+let selectedDuration = 0;
 
 function loadTasks() {
   try {
@@ -112,7 +161,7 @@ function saveLanguage(language) {
 }
 
 function t(key, values = {}) {
-  const value = translations[currentLanguage][key] ?? translations.pl[key] ?? "";
+  const value = translations[currentLanguage][key] ?? translations.en[key] ?? "";
   return Object.entries(values).reduce(
     (text, [name, replacement]) => text.replace(`{${name}}`, replacement),
     value
@@ -136,12 +185,14 @@ function updateDocumentMeta() {
   document.title = t("pageTitle");
 
   const description = document.querySelector('meta[name="description"]');
+  const ogLocale = document.querySelector('meta[property="og:locale"]');
   const ogTitle = document.querySelector('meta[property="og:title"]');
   const ogDescription = document.querySelector('meta[property="og:description"]');
   const twitterTitle = document.querySelector('meta[name="twitter:title"]');
   const twitterDescription = document.querySelector('meta[name="twitter:description"]');
 
   description?.setAttribute("content", t("pageDescription"));
+  ogLocale?.setAttribute("content", t("ogLocale"));
   ogTitle?.setAttribute("content", t("pageTitle"));
   ogDescription?.setAttribute("content", t("pageDescription"));
   twitterTitle?.setAttribute("content", t("pageTitle"));
@@ -184,6 +235,7 @@ function applyTranslations({ animate = false } = {}) {
 
   updateDocumentMeta();
   updateCounter();
+  updateTimerDisplays();
 }
 
 function updateCounter() {
@@ -199,6 +251,109 @@ function updateCounter() {
     activeCount === 1 ? t("activeSingular") : t("activePlural", { count: activeCount });
 }
 
+function getSelectedDuration() {
+  if (selectedDuration !== "custom") {
+    return Number(selectedDuration);
+  }
+
+  const minutes = Number(customTimerInput.value);
+  if (!Number.isFinite(minutes) || minutes < 1) {
+    return 0;
+  }
+
+  return Math.round(minutes * 60 * 1000);
+}
+
+function setSelectedDuration(value) {
+  selectedDuration = value === "custom" ? "custom" : Number(value);
+  timerPresetButtons.forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.duration === String(value));
+  });
+  customTimer.classList.toggle("is-hidden", selectedDuration !== "custom");
+}
+
+function requestNotificationPermission() {
+  if (!("Notification" in window) || Notification.permission !== "default") {
+    return;
+  }
+
+  Notification.requestPermission();
+}
+
+function sendTimerNotification(task) {
+  if (!("Notification" in window) || Notification.permission !== "granted") {
+    return;
+  }
+
+  new Notification(t("notificationTitle"), {
+    body: t("notificationBody", { task: task.text }),
+    icon: "favicon.svg",
+  });
+}
+
+function formatDuration(milliseconds) {
+  const totalSeconds = Math.max(0, Math.ceil(milliseconds / 1000));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  }
+
+  if (minutes > 0) {
+    return `${minutes}m ${seconds}s`;
+  }
+
+  return `${seconds}s`;
+}
+
+function timerText(task) {
+  if (!task.endsAt) {
+    return "";
+  }
+
+  const remaining = task.endsAt - Date.now();
+  if (remaining <= 0) {
+    return t("timeExpired");
+  }
+
+  return t("timeLeft", { time: formatDuration(remaining) });
+}
+
+function updateTimerDisplays() {
+  document.querySelectorAll(".task").forEach((item) => {
+    const task = tasks.find((candidate) => candidate.id === item.dataset.id);
+    const timer = item.querySelector(".task__timer");
+    if (!task || !timer) {
+      return;
+    }
+
+    timer.textContent = timerText(task);
+    timer.classList.toggle("is-expired", Boolean(task.endsAt && task.endsAt <= Date.now()));
+  });
+}
+
+function checkExpiredTimers() {
+  let changed = false;
+
+  tasks.forEach((task) => {
+    if (!task.endsAt || task.done || task.timerNotified || task.endsAt > Date.now()) {
+      return;
+    }
+
+    task.timerNotified = true;
+    changed = true;
+    sendTimerNotification(task);
+  });
+
+  if (changed) {
+    saveTasks();
+  }
+
+  updateTimerDisplays();
+}
+
 function renderTasks() {
   list.replaceChildren();
 
@@ -209,12 +364,15 @@ function renderTasks() {
     const item = template.content.firstElementChild.cloneNode(true);
     const checkbox = item.querySelector(".task__checkbox");
     const text = item.querySelector(".task__text");
+    const timer = item.querySelector(".task__timer");
     const deleteButton = item.querySelector(".task__delete");
 
     item.dataset.id = task.id;
     item.classList.toggle("is-done", task.done);
     checkbox.checked = task.done;
     text.textContent = task.text;
+    timer.textContent = timerText(task);
+    timer.classList.toggle("is-expired", Boolean(task.endsAt && task.endsAt <= Date.now()));
     deleteButton.setAttribute("aria-label", t("deleteTask"));
 
     checkbox.addEventListener("change", () => toggleTask(task.id));
@@ -227,11 +385,21 @@ function renderTasks() {
 }
 
 function addTask(text) {
+  const duration = getSelectedDuration();
+  const now = Date.now();
+
+  if (duration > 0) {
+    requestNotificationPermission();
+  }
+
   tasks.unshift({
-    id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`,
+    id: `${now.toString(36)}-${Math.random().toString(36).slice(2)}`,
     text,
     done: false,
-    createdAt: Date.now(),
+    createdAt: now,
+    durationMs: duration || null,
+    endsAt: duration > 0 ? now + duration : null,
+    timerNotified: false,
   });
   saveTasks();
   renderTasks();
@@ -273,6 +441,12 @@ filterButtons.forEach((button) => {
   });
 });
 
+timerPresetButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    setSelectedDuration(button.dataset.duration);
+  });
+});
+
 languageButtons.forEach((button) => {
   button.addEventListener("click", () => {
     const nextLanguage = button.dataset.lang;
@@ -303,5 +477,7 @@ clearAll.addEventListener("click", () => {
   renderTasks();
 });
 
+setSelectedDuration("0");
 applyTranslations();
 renderTasks();
+setInterval(checkExpiredTimers, 1000);
