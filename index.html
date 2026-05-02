@@ -87,6 +87,22 @@
         <button class="add-button" type="submit" data-i18n="addButton">Add task</button>
       </form>
 
+      <section class="toolbar" aria-label="Task filters" data-i18n-aria="filtersLabel">
+        <div class="filters" role="group" aria-label="Show tasks" data-i18n-aria="showTasksLabel">
+          <button class="filter is-active" type="button" data-filter="all" data-i18n="filterAll">All</button>
+          <button class="filter" type="button" data-filter="active" data-i18n="filterActive">Active</button>
+          <button class="filter" type="button" data-filter="done" data-i18n="filterDone">Done</button>
+        </div>
+        <div class="clear-actions">
+          <button class="clear-button" id="clear-completed" type="button" data-i18n="clearCompleted">Clear done</button>
+          <button class="clear-button clear-button--danger" id="clear-all" type="button" data-i18n="clearAll">Clear all</button>
+        </div>
+      </section>
+
+      <ul class="task-list" id="task-list" aria-live="polite"></ul>
+
+      <p class="empty-state" id="empty-state" data-i18n="emptyState">No tasks yet. Add the first one and make some order.</p>
+
       <section class="global-timer" aria-labelledby="global-timer-title">
         <div>
           <h2 id="global-timer-title" data-i18n="globalTimerTitle">Focus timer</h2>
@@ -110,22 +126,6 @@
         </div>
         <p class="global-timer__status" id="global-timer-status" data-i18n="timerReady">Ready</p>
       </section>
-
-      <section class="toolbar" aria-label="Task filters" data-i18n-aria="filtersLabel">
-        <div class="filters" role="group" aria-label="Show tasks" data-i18n-aria="showTasksLabel">
-          <button class="filter is-active" type="button" data-filter="all" data-i18n="filterAll">All</button>
-          <button class="filter" type="button" data-filter="active" data-i18n="filterActive">Active</button>
-          <button class="filter" type="button" data-filter="done" data-i18n="filterDone">Done</button>
-        </div>
-        <div class="clear-actions">
-          <button class="clear-button" id="clear-completed" type="button" data-i18n="clearCompleted">Clear done</button>
-          <button class="clear-button clear-button--danger" id="clear-all" type="button" data-i18n="clearAll">Clear all</button>
-        </div>
-      </section>
-
-      <ul class="task-list" id="task-list" aria-live="polite"></ul>
-
-      <p class="empty-state" id="empty-state" data-i18n="emptyState">No tasks yet. Add the first one and make some order.</p>
     </main>
 
     <template id="task-template">
