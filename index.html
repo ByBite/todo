@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ToDo - simple task list saved in your browser</title>
+    <meta name="description" content="A simple todo app for adding, filtering, and completing tasks. Your list is saved locally in the browser.">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#07110d">
+    <meta name="application-name" content="ToDo">
+    <meta name="apple-mobile-web-app-title" content="ToDo">
+    <meta name="format-detection" content="telephone=no">
+
+    <meta property="og:locale" content="en_US">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="ToDo - simple task list saved in your browser">
+    <meta property="og:description" content="A simple todo app for adding, filtering, and completing tasks. Your list is saved locally in the browser.">
+    <meta property="og:site_name" content="ToDo">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="ToDo - simple task list saved in your browser">
+    <meta name="twitter:description" content="A simple todo app for adding, filtering, and completing tasks. Your list is saved locally in the browser.">
+
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "ToDo",
+        "applicationCategory": "ProductivityApplication",
+        "operatingSystem": "Any",
+        "inLanguage": ["pl-PL", "en", "de"],
+        "description": "A simple todo app for adding, filtering, and completing tasks. Your list is saved locally in the browser.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "PLN"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <main class="app" aria-labelledby="page-title">
+      <header class="app__header">
+        <div>
+          <h1 id="page-title">ToDo</h1>
+        </div>
+        <div class="header-actions">
+          <div class="language-switcher" role="group" aria-label="Language selection" data-i18n-aria="languageSwitcherLabel">
+            <button class="language-button" type="button" data-lang="pl" aria-label="Polski">
+              <img class="language-button__flag" src="assets/flag-pl.svg" alt="" width="24" height="16">
+              <span class="language-button__code">PL</span>
+            </button>
+            <button class="language-button is-active" type="button" data-lang="en" aria-label="English">
+              <img class="language-button__flag" src="assets/flag-gb.svg" alt="" width="24" height="16">
+              <span class="language-button__code">EN</span>
+            </button>
+            <button class="language-button" type="button" data-lang="de" aria-label="Deutsch">
+              <img class="language-button__flag" src="assets/flag-de.svg" alt="" width="24" height="16">
+              <span class="language-button__code">DE</span>
+            </button>
+          </div>
+          <span class="counter" id="task-counter">0 tasks</span>
+        </div>
+      </header>
+
+      <form class="task-form" id="task-form" autocomplete="off">
+        <label class="sr-only" for="task-input" data-i18n="inputLabel">New task</label>
+        <input id="task-input" type="text" maxlength="120" placeholder="Add a new task..." data-i18n-placeholder="inputPlaceholder" required>
+        <button type="submit" data-i18n="addButton">Add</button>
+      </form>
+
+      <section class="toolbar" aria-label="Task filters" data-i18n-aria="filtersLabel">
+        <div class="filters" role="group" aria-label="Show tasks" data-i18n-aria="showTasksLabel">
+          <button class="filter is-active" type="button" data-filter="all" data-i18n="filterAll">All</button>
+          <button class="filter" type="button" data-filter="active" data-i18n="filterActive">Active</button>
+          <button class="filter" type="button" data-filter="done" data-i18n="filterDone">Done</button>
+        </div>
+        <div class="clear-actions">
+          <button class="clear-button" id="clear-completed" type="button" data-i18n="clearCompleted">Clear done</button>
+          <button class="clear-button clear-button--danger" id="clear-all" type="button" data-i18n="clearAll">Clear all</button>
+        </div>
+      </section>
+
+      <ul class="task-list" id="task-list" aria-live="polite"></ul>
+
+      <p class="empty-state" id="empty-state" data-i18n="emptyState">No tasks yet. Add the first one and make some order.</p>
+    </main>
+
+    <template id="task-template">
+      <li class="task">
+        <label class="task__label">
+          <input class="task__checkbox" type="checkbox">
+          <span class="task__text"></span>
+        </label>
+        <button class="task__delete" type="button" aria-label="Delete task" data-i18n-aria="deleteTask">&times;</button>
+      </li>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+</html>
