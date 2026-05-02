@@ -9,6 +9,8 @@ A simple browser-based ToDo app with a dark interface, smooth animations, and lo
 - Filter tasks by all, active, or done.
 - Clear completed tasks.
 - Clear all tasks.
+- Add timers to tasks with ready presets or a custom number of minutes.
+- Send a browser notification when a task timer ends.
 - Switch language between English, Polish, and German.
 - Save tasks and the selected language in the browser with `localStorage`.
 - Use local SVG flag images instead of emoji flags.
@@ -45,6 +47,8 @@ Prosta aplikacja ToDo działająca w przeglądarce, z ciemnym interfejsem, płyn
 - Filtrowanie zadań: wszystkie, aktywne lub gotowe.
 - Czyszczenie wykonanych zadań.
 - Czyszczenie wszystkich zadań.
+- Dodawanie timerów do zadań z gotowych ustawień lub własnej liczby minut.
+- Wysyłanie powiadomienia w przeglądarce po zakończeniu timera.
 - Zmiana języka między angielskim, polskim i niemieckim.
 - Zapisywanie zadań oraz wybranego języka w przeglądarce przez `localStorage`.
 - Lokalne obrazki flag SVG zamiast flag jako emoji.
