@@ -64,14 +64,24 @@ button {
 
 h1 {
   margin: 0;
-  font-size: clamp(2.5rem, 9vw, 4.7rem);
-  line-height: 0.95;
+  max-width: 430px;
+  font-size: clamp(2.1rem, 7vw, 4rem);
+  line-height: 1;
   letter-spacing: 0;
   color: var(--ink);
   text-shadow:
     0 0 24px rgba(78, 176, 142, 0.25),
     0 10px 28px rgba(0, 0, 0, 0.3);
   animation: title-enter 680ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.helper-text {
+  max-width: 430px;
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 0.98rem;
+  line-height: 1.5;
+  animation: fade-slide 560ms ease-out 110ms both;
 }
 
 .header-actions {
@@ -154,7 +164,7 @@ h1 {
 
 .task-form {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr;
   gap: 10px;
   margin-bottom: 16px;
   animation: fade-slide 560ms ease-out 150ms both;
@@ -185,17 +195,96 @@ h1 {
   font-weight: 700;
 }
 
-.task-form button {
+.add-button {
   height: 48px;
   padding: 0 18px;
   color: #fff;
   background: var(--brand);
 }
 
-.task-form button:hover {
+.add-button:hover {
   background: var(--brand-dark);
   transform: translateY(-1px);
   box-shadow: 0 10px 24px rgba(15, 90, 69, 0.28);
+}
+
+.timer-controls {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(12, 24, 19, 0.72);
+}
+
+.timer-controls__label {
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.timer-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.timer-preset {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  background: var(--surface-soft);
+}
+
+.timer-preset:hover {
+  color: var(--ink);
+  border-color: #365446;
+  transform: translateY(-1px);
+}
+
+.timer-preset.is-active {
+  color: #fff;
+  border-color: rgba(78, 176, 142, 0.34);
+  background: var(--brand);
+  box-shadow: 0 8px 18px rgba(15, 90, 69, 0.25);
+}
+
+.custom-timer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.custom-timer input {
+  width: 110px;
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  background: #0c1813;
+  outline: none;
+}
+
+.custom-timer input:focus {
+  border-color: var(--brand-light);
+  box-shadow: 0 0 0 3px rgba(78, 176, 142, 0.16);
+}
+
+.custom-timer.is-hidden {
+  display: none;
+}
+
+.form-help {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.4;
 }
 
 .toolbar {
@@ -300,9 +389,30 @@ h1 {
   flex: 0 0 auto;
 }
 
+.task__content {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
 .task__text {
   min-width: 0;
   overflow-wrap: anywhere;
+}
+
+.task__timer {
+  min-height: 1em;
+  color: var(--brand-light);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.task__timer:empty {
+  display: none;
+}
+
+.task__timer.is-expired {
+  color: #f0a17a;
 }
 
 .task.is-done .task__text {
@@ -474,7 +584,16 @@ h1 {
     grid-template-columns: 1fr;
   }
 
-  .task-form button {
+  .add-button {
+    width: 100%;
+  }
+
+  .timer-presets {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .timer-preset {
     width: 100%;
   }
 
