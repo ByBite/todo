@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 24" role="img" aria-label="United Kingdom">
+  <clipPath id="round">
+    <rect width="36" height="24" rx="4"/>
+  </clipPath>
+  <g clip-path="url(#round)">
+    <path fill="#012169" d="M0 0h36v24H0z"/>
+    <path fill="#fff" d="m0 0 36 24h-5.4L0 3.6zm36 0L0 24h5.4L36 3.6z"/>
+    <path fill="#c8102e" d="m0 0 36 24h-3.6L0 2.4zm36 0L0 24h3.6L36 2.4z"/>
+    <path fill="#fff" d="M14.4 0h7.2v24h-7.2zM0 8.4h36v7.2H0z"/>
+    <path fill="#c8102e" d="M15.84 0h4.32v24h-4.32zM0 9.84h36v4.32H0z"/>
+  </g>
+  <rect width="35" height="23" x=".5" y=".5" rx="3.5" fill="none" stroke="#000" stroke-opacity=".16"/>
+</svg>
