@@ -1,5 +1,6 @@
 const STORAGE_KEY = "todo.tasks.v1";
 const LANGUAGE_KEY = "todo.language.v1";
+const GLOBAL_TIMER_KEY = "todo.globalTimer.v1";
 
 const translations = {
   pl: {
@@ -20,6 +21,16 @@ const translations = {
     customTimerLabel: "Minuty",
     notificationHelp:
       "Zadania z timerem mogą wysłać powiadomienie w przeglądarce po zakończeniu czasu.",
+    globalTimerTitle: "Główny timer",
+    globalTimerHelp: "Użyj jednego większego timera dla całej sesji pracy.",
+    globalTimerPresetsLabel: "Gotowe czasy głównego timera",
+    timerStart: "Start",
+    timerPause: "Pauza",
+    timerReset: "Reset",
+    timerReady: "Gotowy",
+    timerRunning: "Timer działa",
+    timerPaused: "Timer zatrzymany",
+    globalNotificationBody: "Główny timer zakończył odliczanie.",
     filtersLabel: "Filtry zadań",
     showTasksLabel: "Pokaż zadania",
     filterAll: "Wszystkie",
@@ -57,6 +68,16 @@ const translations = {
     customTimerLabel: "Minutes",
     notificationHelp:
       "Timed tasks can send a browser notification when the time ends.",
+    globalTimerTitle: "Focus timer",
+    globalTimerHelp: "Use one larger timer for the whole task session.",
+    globalTimerPresetsLabel: "Focus timer presets",
+    timerStart: "Start",
+    timerPause: "Pause",
+    timerReset: "Reset",
+    timerReady: "Ready",
+    timerRunning: "Timer running",
+    timerPaused: "Timer paused",
+    globalNotificationBody: "The focus timer has finished.",
     filtersLabel: "Task filters",
     showTasksLabel: "Show tasks",
     filterAll: "All",
@@ -94,6 +115,16 @@ const translations = {
     customTimerLabel: "Minuten",
     notificationHelp:
       "Aufgaben mit Timer können eine Browser-Benachrichtigung senden, wenn die Zeit abgelaufen ist.",
+    globalTimerTitle: "Haupttimer",
+    globalTimerHelp: "Nutze einen größeren Timer für die ganze Arbeitssitzung.",
+    globalTimerPresetsLabel: "Vorlagen für den Haupttimer",
+    timerStart: "Start",
+    timerPause: "Pause",
+    timerReset: "Zurücksetzen",
+    timerReady: "Bereit",
+    timerRunning: "Timer läuft",
+    timerPaused: "Timer pausiert",
+    globalNotificationBody: "Der Haupttimer ist abgelaufen.",
     filtersLabel: "Aufgabenfilter",
     showTasksLabel: "Aufgaben anzeigen",
     filterAll: "Alle",
@@ -125,14 +156,23 @@ const clearCompleted = document.querySelector("#clear-completed");
 const clearAll = document.querySelector("#clear-all");
 const customTimer = document.querySelector(".custom-timer");
 const customTimerInput = document.querySelector("#custom-timer-input");
+const globalTimerDisplay = document.querySelector("#global-timer-display");
+const globalTimerStatus = document.querySelector("#global-timer-status");
+const globalCustomTimer = document.querySelector(".global-custom-timer");
+const globalCustomTimerInput = document.querySelector("#global-custom-timer-input");
+const globalTimerStart = document.querySelector("#global-timer-start");
+const globalTimerPause = document.querySelector("#global-timer-pause");
+const globalTimerReset = document.querySelector("#global-timer-reset");
 const filterButtons = document.querySelectorAll(".filter");
 const languageButtons = document.querySelectorAll(".language-button");
 const timerPresetButtons = document.querySelectorAll(".timer-preset");
+const globalTimerPresetButtons = document.querySelectorAll(".global-timer-preset");
 
 let tasks = loadTasks();
 let currentFilter = "all";
 let currentLanguage = loadLanguage();
 let selectedDuration = 0;
+let globalTimer = loadGlobalTimer();
 
 function loadTasks() {
   try {
@@ -154,6 +194,32 @@ function loadLanguage() {
   } catch {
     return "en";
   }
+}
+
+function loadGlobalTimer() {
+  const defaultTimer = {
+    durationMs: 10 * 60 * 1000,
+    remainingMs: 10 * 60 * 1000,
+    selectedDuration: "600000",
+    running: false,
+    endsAt: null,
+    notified: false,
+  };
+
+  try {
+    const saved = localStorage.getItem(GLOBAL_TIMER_KEY);
+    if (!saved) {
+      return defaultTimer;
+    }
+
+    return { ...defaultTimer, ...JSON.parse(saved), running: false, endsAt: null };
+  } catch {
+    return defaultTimer;
+  }
+}
+
+function saveGlobalTimer() {
+  localStorage.setItem(GLOBAL_TIMER_KEY, JSON.stringify(globalTimer));
 }
 
 function saveLanguage(language) {
@@ -236,6 +302,7 @@ function applyTranslations({ animate = false } = {}) {
   updateDocumentMeta();
   updateCounter();
   updateTimerDisplays();
+  updateGlobalTimerDisplay();
 }
 
 function updateCounter() {
@@ -272,12 +339,52 @@ function setSelectedDuration(value) {
   customTimer.classList.toggle("is-hidden", selectedDuration !== "custom");
 }
 
+function getGlobalCustomDuration() {
+  const minutes = Number(globalCustomTimerInput.value);
+  if (!Number.isFinite(minutes) || minutes < 1) {
+    return 10 * 60 * 1000;
+  }
+
+  return Math.round(minutes * 60 * 1000);
+}
+
+function setGlobalTimerDuration(value) {
+  const duration = value === "custom" ? getGlobalCustomDuration() : Number(value);
+
+  globalTimer = {
+    durationMs: duration,
+    remainingMs: duration,
+    selectedDuration: value,
+    running: false,
+    endsAt: null,
+    notified: false,
+  };
+
+  globalTimerPresetButtons.forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.globalDuration === String(value));
+  });
+  globalCustomTimer.classList.toggle("is-hidden", value !== "custom");
+  saveGlobalTimer();
+  updateGlobalTimerDisplay();
+}
+
 function requestNotificationPermission() {
   if (!("Notification" in window) || Notification.permission !== "default") {
     return;
   }
 
   Notification.requestPermission();
+}
+
+function sendGlobalTimerNotification() {
+  if (!("Notification" in window) || Notification.permission !== "granted") {
+    return;
+  }
+
+  new Notification(t("notificationTitle"), {
+    body: t("globalNotificationBody"),
+    icon: "favicon.svg",
+  });
 }
 
 function sendTimerNotification(task) {
@@ -289,6 +396,17 @@ function sendTimerNotification(task) {
     body: t("notificationBody", { task: task.text }),
     icon: "favicon.svg",
   });
+}
+
+function formatClock(milliseconds) {
+  const totalSeconds = Math.max(0, Math.ceil(milliseconds / 1000));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  return [hours, minutes, seconds]
+    .map((part) => String(part).padStart(2, "0"))
+    .join(":");
 }
 
 function formatDuration(milliseconds) {
@@ -306,6 +424,89 @@ function formatDuration(milliseconds) {
   }
 
   return `${seconds}s`;
+}
+
+function updateGlobalTimerDisplay() {
+  const remaining = globalTimer.running
+    ? Math.max(0, globalTimer.endsAt - Date.now())
+    : globalTimer.remainingMs;
+
+  globalTimerDisplay.textContent = formatClock(remaining);
+
+  if (remaining <= 0) {
+    globalTimerStatus.textContent = t("timeExpired");
+  } else if (globalTimer.running) {
+    globalTimerStatus.textContent = t("timerRunning");
+  } else if (remaining < globalTimer.durationMs) {
+    globalTimerStatus.textContent = t("timerPaused");
+  } else {
+    globalTimerStatus.textContent = t("timerReady");
+  }
+
+  globalTimerPresetButtons.forEach((button) => {
+    button.classList.toggle(
+      "is-active",
+      button.dataset.globalDuration === String(globalTimer.selectedDuration)
+    );
+  });
+  globalCustomTimer.classList.toggle("is-hidden", globalTimer.selectedDuration !== "custom");
+}
+
+function startGlobalTimer() {
+  if (globalTimer.remainingMs <= 0) {
+    globalTimer.remainingMs = globalTimer.durationMs;
+  }
+
+  requestNotificationPermission();
+  globalTimer.running = true;
+  globalTimer.endsAt = Date.now() + globalTimer.remainingMs;
+  globalTimer.notified = false;
+  saveGlobalTimer();
+  updateGlobalTimerDisplay();
+}
+
+function pauseGlobalTimer() {
+  if (!globalTimer.running) {
+    return;
+  }
+
+  globalTimer.remainingMs = Math.max(0, globalTimer.endsAt - Date.now());
+  globalTimer.running = false;
+  globalTimer.endsAt = null;
+  saveGlobalTimer();
+  updateGlobalTimerDisplay();
+}
+
+function resetGlobalTimer() {
+  globalTimer.running = false;
+  globalTimer.endsAt = null;
+  globalTimer.remainingMs = globalTimer.durationMs;
+  globalTimer.notified = false;
+  saveGlobalTimer();
+  updateGlobalTimerDisplay();
+}
+
+function tickGlobalTimer() {
+  if (!globalTimer.running) {
+    updateGlobalTimerDisplay();
+    return;
+  }
+
+  globalTimer.remainingMs = Math.max(0, globalTimer.endsAt - Date.now());
+
+  if (globalTimer.remainingMs <= 0) {
+    globalTimer.running = false;
+    globalTimer.endsAt = null;
+
+    if (!globalTimer.notified) {
+      globalTimer.notified = true;
+      sendGlobalTimerNotification();
+    }
+
+    saveGlobalTimer();
+  }
+
+  updateGlobalTimerDisplay();
 }
 
 function timerText(task) {
@@ -447,6 +648,22 @@ timerPresetButtons.forEach((button) => {
   });
 });
 
+globalTimerPresetButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    setGlobalTimerDuration(button.dataset.globalDuration);
+  });
+});
+
+globalCustomTimerInput.addEventListener("input", () => {
+  if (globalTimer.selectedDuration === "custom" && !globalTimer.running) {
+    setGlobalTimerDuration("custom");
+  }
+});
+
+globalTimerStart.addEventListener("click", startGlobalTimer);
+globalTimerPause.addEventListener("click", pauseGlobalTimer);
+globalTimerReset.addEventListener("click", resetGlobalTimer);
+
 languageButtons.forEach((button) => {
   button.addEventListener("click", () => {
     const nextLanguage = button.dataset.lang;
@@ -480,4 +697,8 @@ clearAll.addEventListener("click", () => {
 setSelectedDuration("0");
 applyTranslations();
 renderTasks();
-setInterval(checkExpiredTimers, 1000);
+updateGlobalTimerDisplay();
+setInterval(() => {
+  checkExpiredTimers();
+  tickGlobalTimer();
+}, 1000);
