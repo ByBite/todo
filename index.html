@@ -87,6 +87,30 @@
         <button class="add-button" type="submit" data-i18n="addButton">Add task</button>
       </form>
 
+      <section class="global-timer" aria-labelledby="global-timer-title">
+        <div>
+          <h2 id="global-timer-title" data-i18n="globalTimerTitle">Focus timer</h2>
+          <p class="global-timer__help" data-i18n="globalTimerHelp">Use one larger timer for the whole task session.</p>
+        </div>
+        <div class="global-timer__display" id="global-timer-display" aria-live="polite">00:10:00</div>
+        <div class="global-timer__presets" role="group" aria-label="Focus timer presets" data-i18n-aria="globalTimerPresetsLabel">
+          <button class="global-timer-preset is-active" type="button" data-global-duration="600000">10 min</button>
+          <button class="global-timer-preset" type="button" data-global-duration="3600000">1 h</button>
+          <button class="global-timer-preset" type="button" data-global-duration="18000000">5 h</button>
+          <button class="global-timer-preset" type="button" data-global-duration="custom" data-i18n="timerCustom">Custom</button>
+        </div>
+        <label class="global-custom-timer is-hidden" for="global-custom-timer-input">
+          <span data-i18n="customTimerLabel">Minutes</span>
+          <input id="global-custom-timer-input" type="number" min="1" max="10080" step="1" value="25" inputmode="numeric">
+        </label>
+        <div class="global-timer__actions">
+          <button class="global-timer-button" id="global-timer-start" type="button" data-i18n="timerStart">Start</button>
+          <button class="global-timer-button" id="global-timer-pause" type="button" data-i18n="timerPause">Pause</button>
+          <button class="global-timer-button global-timer-button--muted" id="global-timer-reset" type="button" data-i18n="timerReset">Reset</button>
+        </div>
+        <p class="global-timer__status" id="global-timer-status" data-i18n="timerReady">Ready</p>
+      </section>
+
       <section class="toolbar" aria-label="Task filters" data-i18n-aria="filtersLabel">
         <div class="filters" role="group" aria-label="Show tasks" data-i18n-aria="showTasksLabel">
           <button class="filter is-active" type="button" data-filter="all" data-i18n="filterAll">All</button>
