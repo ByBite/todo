@@ -69,21 +69,6 @@
       <form class="task-form" id="task-form" autocomplete="off">
         <label class="sr-only" for="task-input" data-i18n="inputLabel">New task</label>
         <input id="task-input" type="text" maxlength="120" placeholder="Add a new task..." data-i18n-placeholder="inputPlaceholder" required>
-        <div class="timer-controls" aria-label="Task timer" data-i18n-aria="timerLabel">
-          <span class="timer-controls__label" data-i18n="timerLabel">Timer</span>
-          <div class="timer-presets" role="group" aria-label="Timer presets" data-i18n-aria="timerPresetsLabel">
-            <button class="timer-preset is-active" type="button" data-duration="0" data-i18n="timerNone">No timer</button>
-            <button class="timer-preset" type="button" data-duration="600000">10 min</button>
-            <button class="timer-preset" type="button" data-duration="3600000">1 h</button>
-            <button class="timer-preset" type="button" data-duration="18000000">5 h</button>
-            <button class="timer-preset" type="button" data-duration="custom" data-i18n="timerCustom">Custom</button>
-          </div>
-          <label class="custom-timer is-hidden" for="custom-timer-input">
-            <span data-i18n="customTimerLabel">Minutes</span>
-            <input id="custom-timer-input" type="number" min="1" max="10080" step="1" value="30" inputmode="numeric">
-          </label>
-          <p class="form-help" id="notification-help" data-i18n="notificationHelp">Timed tasks can send a browser notification when the time ends.</p>
-        </div>
         <button class="add-button" type="submit" data-i18n="addButton">Add task</button>
       </form>
 
@@ -115,10 +100,20 @@
           <button class="global-timer-preset" type="button" data-global-duration="18000000">5 h</button>
           <button class="global-timer-preset" type="button" data-global-duration="custom" data-i18n="timerCustom">Custom</button>
         </div>
-        <label class="global-custom-timer is-hidden" for="global-custom-timer-input">
-          <span data-i18n="customTimerLabel">Minutes</span>
-          <input id="global-custom-timer-input" type="number" min="1" max="10080" step="1" value="25" inputmode="numeric">
-        </label>
+        <div class="global-custom-timer is-hidden" aria-label="Custom timer" data-i18n-aria="customTimerLabel">
+          <label>
+            <span data-i18n="customHoursLabel">Hours</span>
+            <input id="global-custom-hours" type="number" min="0" max="168" step="1" value="0" inputmode="numeric">
+          </label>
+          <label>
+            <span data-i18n="customMinutesLabel">Minutes</span>
+            <input id="global-custom-minutes" type="number" min="0" max="59" step="1" value="25" inputmode="numeric">
+          </label>
+          <label>
+            <span data-i18n="customSecondsLabel">Seconds</span>
+            <input id="global-custom-seconds" type="number" min="0" max="59" step="1" value="0" inputmode="numeric">
+          </label>
+        </div>
         <div class="global-timer__actions">
           <button class="global-timer-button" id="global-timer-start" type="button" data-i18n="timerStart">Start</button>
           <button class="global-timer-button" id="global-timer-pause" type="button" data-i18n="timerPause">Pause</button>
@@ -134,7 +129,6 @@
           <input class="task__checkbox" type="checkbox">
           <span class="task__content">
             <span class="task__text"></span>
-            <span class="task__timer"></span>
           </span>
         </label>
         <button class="task__delete" type="button" aria-label="Delete task" data-i18n-aria="deleteTask">&times;</button>
